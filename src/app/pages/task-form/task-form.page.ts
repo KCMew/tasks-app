@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TaskService } from '../../services/task.service';
 import { Router } from '@angular/router';
 import { TaskStatus } from 'src/app/models/status.enum';
@@ -20,10 +20,10 @@ export class TaskFormPage implements OnInit {
     private router: Router
   ) {
     this.taskForm = this.fb.group({
-      title: ['', Validators.required],
-      description: [''],
+      title: ['', [Validators.required, Validators.maxLength(15)]],
+      description: ['', [Validators.maxLength(64)]],
       status: [TaskStatus.TODO, Validators.required],
-      dueDate: ['', Validators.required]
+      dueDate: ['', [Validators.required, this.futureDateValidator]],
     });
   }
 
@@ -34,5 +34,16 @@ export class TaskFormPage implements OnInit {
       this.taskService.addTask(this.taskForm.value);
       this.router.navigate(['/tasks']);
     }
+  }
+
+  private futureDateValidator(control: AbstractControl): { [key: string]: boolean } | null {
+    const selectedDate = new Date(control.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      return { invalidDate: true };
+    }
+    return null;
   }
 } 
