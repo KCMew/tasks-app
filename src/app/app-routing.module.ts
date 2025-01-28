@@ -4,8 +4,6 @@ import { TasksPage } from './pages/tasks/tasks.page';
 import { TaskFormPage } from './pages/task-form/task-form.page';
 import { TaskFormPageModule } from './pages/task-form/task-form.module';
 import { TasksPageModule } from './pages/tasks/tasks.module';
-import { TaskDetailPage } from './pages/task-detail/task-detail.page';
-import { TaskDetailPageModule } from './pages/task-detail/task-detail.module';
 import { TaskGuard } from './guard/task.guard';
 
 const routes: Routes = [
@@ -29,19 +27,13 @@ const routes: Routes = [
     loadChildren: () => import('./pages/task-form/task-form.module').then(m => m.TaskFormPageModule)
   },
   {
-    path: 'task-detail',
-    loadChildren: () => import('./pages/task-detail/task-detail.module').then( m => m.TaskDetailPageModule)
-  },
-  {
-    path: 'task-detail/:id',
-    loadChildren: () => import('./pages/task-detail/task-detail.module').then( m => m.TaskDetailPageModule)
-  },
-  {
     path: 'no-task',
     loadChildren: () => import('./pages/no-task/no-task.module').then( m => m.NoTaskPageModule)
+  },
+  {
+    path: 'task-detail-modal',
+    loadChildren: () => import('./pages/task-detail-modal/task-detail-modal.module').then( m => m.TaskDetailModalPageModule)
   }
-
-
 ];
 
 @NgModule({

@@ -13,7 +13,6 @@ export class TaskGuard implements CanActivate {
     if (this.taskService.getTasksSync().length > 0) {
       return true;
     } else {
-      // Sinon, redirige vers une autre page
       this.router.navigate(['/no-tasks']);
       return false;
     }

@@ -7,10 +7,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="ion-padding">
   <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
     <ion-list>
-      <ion-item>
+      <ion-item class="input">
         <ion-label position="floating">Titre*</ion-label>
         <ion-input formControlName="title" type="text"></ion-input>
       </ion-item>
@@ -19,7 +19,7 @@
         <span *ngIf="taskForm.get('title')?.errors?.['maxlength']">Le titre ne doit pas dépasser 15 caractères.</span>
       </ion-note>
 
-      <ion-item>
+      <ion-item class="input">
         <ion-label position="floating">Description</ion-label>
         <ion-textarea formControlName="description"></ion-textarea>
       </ion-item>
@@ -27,7 +27,7 @@
         <span *ngIf="taskForm.get('description')?.errors?.['maxlength']">La description ne doit pas dépasser 64 caractères.</span>
       </ion-note>
 
-      <ion-item>
+      <ion-item class="input">
         <ion-label>Statut*</ion-label>
         <ion-select formControlName="status">
           <ion-select-option *ngFor="let status of taskStatuses" [value]="status">
@@ -36,11 +36,11 @@
         </ion-select>
       </ion-item>
 
-      <ion-item>
+      <ion-item class="date-container">
         <ion-label>Date limite*</ion-label>
         <ion-datetime-button datetime="dueDate"></ion-datetime-button>
-        <ion-datetime id="dueDate" formControlName="dueDate"></ion-datetime>
       </ion-item>
+      <ion-datetime id="dueDate" formControlName="dueDate"></ion-datetime>
       <ion-note *ngIf="taskForm.get('dueDate')?.invalid && taskForm.get('dueDate')?.touched" color="danger">
         <span *ngIf="taskForm.get('dueDate')?.errors?.['invalidDate']">La date limite ne peut pas être dans le passé.</span>
       </ion-note>

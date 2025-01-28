@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { TaskService } from '../../services/task.service';
 import { Router } from '@angular/router';
 import { TaskStatus } from 'src/app/models/status.enum';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-task-form',
@@ -17,7 +18,8 @@ export class TaskFormPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
-    private router: Router
+    private router: Router,
+    private toastController: ToastController
   ) {
     this.taskForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(15)]],
@@ -29,13 +31,26 @@ export class TaskFormPage implements OnInit {
 
   ngOnInit() {}
 
-  onSubmit() {
+  async onSubmit() {
     if (this.taskForm.valid) {
       this.taskService.addTask(this.taskForm.value);
+
+      this.taskForm.reset();
+
+      const toast = await this.toastController.create({
+        message: 'Tâche créée avec succès.',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom',
+      });
+
+      await toast.present();
+
       this.router.navigate(['/tasks']);
     }
   }
 
+  // Vérifie si la date choisie est dans le futur
   private futureDateValidator(control: AbstractControl): { [key: string]: boolean } | null {
     const selectedDate = new Date(control.value);
     const today = new Date();

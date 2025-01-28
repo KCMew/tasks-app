@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
+import { TaskDetailModalPage } from '../task-detail-modal/task-detail-modal.page';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-tasks',
@@ -14,13 +16,23 @@ export class TasksPage implements OnInit {
   selectedCategory: string = 'all';
   searchTerm: string = '';
 
-  constructor(private taskService: TaskService) {}
+  constructor(private taskService: TaskService, private modalController: ModalController) {}
 
   ngOnInit() {
     this.taskService.getTasks().subscribe(tasks => {
       this.tasks = tasks;
       this.filterTasks();
     });
+  }
+
+  async openTaskDetailModal(taskId: string) {
+    const modal = await this.modalController.create({
+      component: TaskDetailModalPage,
+      componentProps: {
+        taskId: taskId,
+      },
+    });
+    return await modal.present();
   }
 
   sortTasksByDate() {
@@ -71,6 +83,7 @@ export class TasksPage implements OnInit {
     }
   }
 
+  // Compter le nombre de tâches par statut
   countTasksByStatus(status: string): number {
     return this.tasks.filter(task => task.status === status).length;
   }

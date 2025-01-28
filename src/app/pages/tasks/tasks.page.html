@@ -19,22 +19,21 @@
       <ion-label>
         <h2>{{ task.title }}</h2>
         <p>{{ task.description }}</p>
-        <p>Date limite: {{ task.dueDate | date : 'dd/MM/yyyy HH:mm'}}</p>
+        <p>Date limite: {{ task.dueDate | date : 'dd/MM/yyyy HH:mm' }}</p>
         <ion-badge [color]="getBadgeColor(task.status)">
           {{ task.status }}
         </ion-badge>
-      
       </ion-label>
-      <ion-button 
-      fill="clear" 
-      color="primary" 
-      [routerLink]="['/task-detail', task.id]">
-      <ion-icon name="create" class="custom-icon-size"></ion-icon>
-    </ion-button>
-    
+      <ion-button
+        fill="clear"
+        color="primary"
+        (click)="openTaskDetailModal(task.id)"
+      >
+        <ion-icon name="create" class="custom-icon-size"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
-</ion-content> 
+</ion-content>
 
 <ion-footer>
   <ion-toolbar>
