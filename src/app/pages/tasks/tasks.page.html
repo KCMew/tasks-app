@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Mes Tâches</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/task-form">
+        <ion-icon name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterTasks()"
+                   debounce="500" placeholder="Rechercher une tâche"></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let task of filteredTasks">
+      <ion-label>
+        <h2>{{ task.title }}</h2>
+        <p>{{ task.description }}</p>
+        <p>Date limite: {{ task.dueDate | date : 'dd/MM/yyyy HH:mm'}}</p>
+        <ion-badge [color]="getBadgeColor(task.status)">
+          {{ task.status }}
+        </ion-badge>
+      
+      </ion-label>
+      <ion-button 
+      fill="clear" 
+      color="primary" 
+      [routerLink]="['/task-detail', task.id]">
+      <ion-icon name="create" class="custom-icon-size"></ion-icon>
+    </ion-button>
+    
+    </ion-item>
+  </ion-list>
+</ion-content> 
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="selectedCategory" (ionChange)="filterTasks()">
+      <ion-segment-button value="all">
+        <ion-label>Toutes ({{ tasks.length }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button 
+        value="todo" 
+        [disabled]="countTasksByStatus('À faire') === 0">
+        <ion-label>À faire ({{ countTasksByStatus('À faire') }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button 
+        value="inProgress" 
+        [disabled]="countTasksByStatus('En cours') === 0">
+        <ion-label>En cours ({{ countTasksByStatus('En cours') }})</ion-label>
+      </ion-segment-button>
+      <ion-segment-button 
+        value="completed" 
+        [disabled]="countTasksByStatus('Terminé') === 0">
+        <ion-label>Terminé ({{ countTasksByStatus('Terminé') }})</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-footer>
