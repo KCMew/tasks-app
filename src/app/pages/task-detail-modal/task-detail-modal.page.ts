@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { ModalController, ToastController } from '@ionic/angular';  // Importez ToastController
+import { ModalController, ToastController, AlertController } from '@ionic/angular';
 import { TaskStatus } from 'src/app/models/status.enum';
 import { TaskService } from 'src/app/services/task.service';
 import { Task } from 'src/app/models/task.model';
@@ -20,7 +20,8 @@ export class TaskDetailModalPage implements OnInit {
     private modalController: ModalController,
     private fb: FormBuilder,
     private taskService: TaskService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private alertController: AlertController
   ) {
     this.taskForm = this.fb.group({
       title: ['', Validators.required],
@@ -69,20 +70,40 @@ export class TaskDetailModalPage implements OnInit {
   }
 
   async onDelete() {
-    if (this.taskId) {
-      await this.taskService.deleteTask(this.taskId);
+    const alert = await this.alertController.create({
+      header: 'Êtes-vous sûr ?',
+      message: 'Cette action supprimera définitivement la tâche.',
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Supprimer',
+          handler: async () => {
+            if (this.taskId) {
+              await this.taskService.deleteTask(this.taskId);
 
-      const toast = await this.toastController.create({
-        message: 'Tâche supprimée avec succès.',
-        duration: 2000,
-        color: 'danger',
-        position: 'bottom',
-      });
+              const toast = await this.toastController.create({
+                message: 'Tâche supprimée avec succès.',
+                duration: 2000,
+                color: 'danger',
+                position: 'bottom',
+              });
 
-      await toast.present();
+              await toast.present();
 
-      this.closeModal();
-    }
+              this.closeModal();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   closeModal() {

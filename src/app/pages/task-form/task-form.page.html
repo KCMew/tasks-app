@@ -34,6 +34,9 @@
             {{ status }}
           </ion-select-option>
         </ion-select>
+        <ion-text color="danger" *ngIf="taskForm.get('status')?.invalid && taskForm.get('status')?.touched">
+          Le statut est obligatoire.
+        </ion-text>
       </ion-item>
 
       <ion-item class="date-container">

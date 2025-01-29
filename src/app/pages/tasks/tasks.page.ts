@@ -3,8 +3,8 @@ import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModalPage } from '../task-detail-modal/task-detail-modal.page';
 import { ModalController } from '@ionic/angular';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { App } from '@capacitor/app';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-tasks',
@@ -17,8 +17,9 @@ export class TasksPage implements OnInit {
   filteredTasks: Task[] = [];
   selectedCategory: string = 'all';
   searchTerm: string = '';
+  isLoading: boolean = false;
 
-  constructor(private taskService: TaskService, private modalController: ModalController) {
+  constructor(private taskService: TaskService, private modalController: ModalController, private notificationService: NotificationService) {
     this.listenAppState();
   }
 
@@ -49,29 +50,36 @@ export class TasksPage implements OnInit {
 
   // Méthode pour filtrer les tâches en fonction de la catégorie et de la recherche par titre
   filterTasks() {
-    let filtered = this.tasks;
+    this.isLoading = true;
+  
+    setTimeout(() => {
+      let filtered = this.tasks;
 
-    switch (this.selectedCategory) {
-      case 'todo':
-        filtered = filtered.filter(task => task.status === 'À faire');
-        break;
-      case 'inProgress':
-        filtered = filtered.filter(task => task.status === 'En cours');
-        break;
-      case 'completed':
-        filtered = filtered.filter(task => task.status === 'Terminé');
-        break;
-      case 'all':
-      default:
-        break;
-    }
+      switch (this.selectedCategory) {
+        case 'todo':
+          filtered = filtered.filter(task => task.status === 'À faire');
+          break;
+        case 'inProgress':
+          filtered = filtered.filter(task => task.status === 'En cours');
+          break;
+        case 'completed':
+          filtered = filtered.filter(task => task.status === 'Terminé');
+          break;
+        case 'all':
+        default:
+          break;
+      }
 
-    if (this.searchTerm.trim()) {
-      filtered = filtered.filter(task => task.title.toLowerCase().includes(this.searchTerm.toLowerCase()));
-    }
+      if (this.searchTerm.trim()) {
+        filtered = filtered.filter(task => 
+          task.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+        );
+      }
 
-    this.filteredTasks = filtered;
-    this.sortTasksByDate();
+      this.filteredTasks = filtered;
+      this.sortTasksByDate();
+      this.isLoading = false;
+    }, 400);
   }
 
   getBadgeColor(status: string): string {
@@ -95,28 +103,9 @@ export class TasksPage implements OnInit {
   listenAppState() {
     App.addListener('appStateChange', (state) => {
       if (!state.isActive) {
-        this.sendNotificationOnExit();
+        const hasCompletedTask = this.tasks.some(task => task.status === 'Terminé');
+        this.notificationService.scheduleNotification(hasCompletedTask);
       }
-    });
-  }
-
-  async sendNotificationOnExit() {
-    const hasCompletedTask = this.tasks.some(task => task.status === 'Terminé');
-
-    const notificationMessage = hasCompletedTask 
-      ? 'Vous avez une tâche terminée !' 
-      : 'Vous n\'avez pas de tâches terminées.';
-
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          id: 1,
-          title: 'Rappel de tâche',
-          body: notificationMessage,
-          schedule: { at: new Date(new Date().getTime() + 1000) },
-          sound: 'default',
-        },
-      ],
     });
   }
 }
