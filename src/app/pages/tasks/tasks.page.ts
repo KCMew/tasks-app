@@ -3,6 +3,8 @@ import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
 import { TaskDetailModalPage } from '../task-detail-modal/task-detail-modal.page';
 import { ModalController } from '@ionic/angular';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { App } from '@capacitor/app';
 
 @Component({
   selector: 'app-tasks',
@@ -16,7 +18,9 @@ export class TasksPage implements OnInit {
   selectedCategory: string = 'all';
   searchTerm: string = '';
 
-  constructor(private taskService: TaskService, private modalController: ModalController) {}
+  constructor(private taskService: TaskService, private modalController: ModalController) {
+    this.listenAppState();
+  }
 
   ngOnInit() {
     this.taskService.getTasks().subscribe(tasks => {
@@ -86,5 +90,33 @@ export class TasksPage implements OnInit {
   // Compter le nombre de tâches par statut
   countTasksByStatus(status: string): number {
     return this.tasks.filter(task => task.status === status).length;
+  }
+  
+  listenAppState() {
+    App.addListener('appStateChange', (state) => {
+      if (!state.isActive) {
+        this.sendNotificationOnExit();
+      }
+    });
+  }
+
+  async sendNotificationOnExit() {
+    const hasCompletedTask = this.tasks.some(task => task.status === 'Terminé');
+
+    const notificationMessage = hasCompletedTask 
+      ? 'Vous avez une tâche terminée !' 
+      : 'Vous n\'avez pas de tâches terminées.';
+
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 1,
+          title: 'Rappel de tâche',
+          body: notificationMessage,
+          schedule: { at: new Date(new Date().getTime() + 1000) },
+          sound: 'default',
+        },
+      ],
+    });
   }
 }
